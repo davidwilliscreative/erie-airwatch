@@ -1,0 +1,14 @@
+drop function if exists public.admin_set_report_status(uuid, text, text);
+drop function if exists public.admin_create_report(uuid, text, timestamptz, timestamptz);
+drop function if exists airwatch.report_metrics(uuid, timestamptz, timestamptz);
+drop function if exists public.admin_upsert_zone(uuid, text, text, jsonb, boolean);
+drop function if exists public.admin_set_policy(uuid, text, numeric, int);
+drop function if exists public.admin_coverage(uuid, int);
+drop function if exists public.admin_validation_summary(uuid);
+drop function if exists public.admin_add_validation_example(uuid, text, text, timestamptz, timestamptz, text, text);
+drop function if exists public.admin_review_event(uuid, text, text, text);
+drop function if exists public.admin_event_evidence(uuid);
+drop function if exists public.admin_review_queue(text, text, int);
+drop function if exists public.admin_whoami();
+drop function if exists airwatch.require_admin();
+drop function if exists airwatch.require_reviewer();

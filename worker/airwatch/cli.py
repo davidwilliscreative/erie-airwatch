@@ -95,6 +95,14 @@ def cmd_load_demo(a):
     print(json.dumps(process_window(ap, store, ds.start, ds.end), indent=2))
 
 
+def cmd_seed_sql(a):
+    from .seed_sql import seed_sql
+
+    path = REPO_ROOT / "supabase" / "seed.sql"
+    path.write_text(seed_sql(load_airport(a.airport)))
+    print(f"wrote {path}")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="airwatch", description="Erie AirWatch worker")
     p.add_argument("--airport", default="KEIK")
@@ -112,6 +120,9 @@ def main(argv=None):
     s.add_argument("--days", type=int, default=14)
     s.add_argument("--seed", type=int, default=99)
     s.set_defaults(fn=cmd_evaluate)
+
+    s = sub.add_parser("seed-sql", help="regenerate supabase/seed.sql from config/airports")
+    s.set_defaults(fn=cmd_seed_sql)
 
     for name, fn in (("run", cmd_run), ("load-demo", cmd_load_demo)):
         s = sub.add_parser(name)

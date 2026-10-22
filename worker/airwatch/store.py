@@ -117,7 +117,7 @@ class PostgresStore(Store):
             insert into airwatch.observations
               (airport_id, source_id, source_event_id, ts, aircraft_key, geom, alt_baro_ft, alt_geom_ft,
                groundspeed_kt, track_deg, vertical_rate_fpm, on_ground, callsign, quality_flags)
-            values (%s, %s, %s, %s, %s, st_setsrid(st_makepoint(%s, %s), 4326), %s, %s, %s, %s, %s, %s, %s, %s)
+            values (%s, %s, %s, %s, %s, extensions.st_setsrid(extensions.st_makepoint(%s, %s), 4326), %s, %s, %s, %s, %s, %s, %s, %s)
             on conflict do nothing
         """
         rows = [
@@ -137,7 +137,7 @@ class PostgresStore(Store):
 
     def observations_between(self, start, end):
         sql = """
-            select s.name, o.source_event_id, o.ts, o.aircraft_key, st_y(o.geom), st_x(o.geom), o.alt_baro_ft,
+            select s.name, o.source_event_id, o.ts, o.aircraft_key, extensions.st_y(o.geom), extensions.st_x(o.geom), o.alt_baro_ft,
                    o.alt_geom_ft, o.groundspeed_kt, o.track_deg, o.vertical_rate_fpm, o.on_ground, o.callsign,
                    o.quality_flags
             from airwatch.observations o join airwatch.sources s on s.id = o.source_id
@@ -146,8 +146,8 @@ class PostgresStore(Store):
         with self.conn.cursor() as cur:
             cur.execute(sql, (self.airport_id, start, end))
             return [
-                Observation(r[0], r[1], r[2].astimezone(timezone.utc), r[3], r[4], r[5], r[6], r[7], r[8], r[9],
-                            r[10], r[11], r[12], tuple(r[13] or ()))
+                Observation(r[0], r[1], r[2].astimezone(timezone.utc), r[3], r[4], r[5], _f(r[6]), _f(r[7]), _f(r[8]),
+                            _f(r[9]), _f(r[10]), r[11], r[12], tuple(r[13] or ()))
                 for r in cur.fetchall()
             ]
 
@@ -228,6 +228,11 @@ class PostgresStore(Store):
                 "insert into airwatch.hourly_metrics (airport_id, hour_start, metric, zone_id, value) values (%s, %s, %s, %s, %s)",
                 [(self.airport_id, r["hour"], r["metric"], r.get("zone_id"), r["value"]) for r in rows],
             )
+
+
+def _f(v) -> float | None:
+    """numeric columns arrive as Decimal; the detector works in floats."""
+    return None if v is None else float(v)
 
 
 def iso(dt: datetime) -> str:
