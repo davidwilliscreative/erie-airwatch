@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from .config import Airport
 from .models import Event, Observation
@@ -57,6 +58,14 @@ def hourly_metrics(airport: Airport, observations: list[Observation], events: li
         counts[(h, "observations", None)] += 1
     for h, keys in aircraft.items():
         counts[(h, "observed_aircraft", None)] = len(keys)
+    # Distinct aircraft per local day, stored at the UTC instant of local midnight.
+    tz = ZoneInfo(airport.timezone)
+    per_day: dict[datetime, set] = defaultdict(set)
+    for o in observations:
+        local = o.ts.astimezone(tz)
+        per_day[local.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)].add(o.aircraft_key)
+    for d, keys in per_day.items():
+        counts[(d, "observed_aircraft_day", None)] = len(keys)
     for e in events:
         if not is_publishable(e, policy):
             continue

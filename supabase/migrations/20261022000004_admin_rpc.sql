@@ -205,11 +205,20 @@ begin
   return v_after;
 end $$;
 
+create or replace function public.admin_list_reports(p_airport uuid)
+returns table (id uuid, kind text, period_start timestamptz, period_end timestamptz, status text, version int)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  perform airwatch.require_admin();
+  return query select r.id, r.kind, r.period_start, r.period_end, r.status, r.version
+    from airwatch.reports r where r.airport_id = p_airport order by r.period_start desc limit 100;
+end $$;
+
 do $$
 declare f text;
 begin
   foreach f in array array[
-    'admin_whoami()', 'admin_review_queue(text, text, int)', 'admin_event_evidence(uuid)',
+    'admin_whoami()', 'admin_list_reports(uuid)', 'admin_review_queue(text, text, int)', 'admin_event_evidence(uuid)',
     'admin_review_event(uuid, text, text, text)',
     'admin_add_validation_example(uuid, text, text, timestamptz, timestamptz, text, text)',
     'admin_validation_summary(uuid)', 'admin_coverage(uuid, int)', 'admin_set_policy(uuid, text, numeric, int)',

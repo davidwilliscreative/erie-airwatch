@@ -1,3 +1,4 @@
+drop function if exists public.admin_list_reports(uuid);
 drop function if exists public.admin_set_report_status(uuid, text, text);
 drop function if exists public.admin_create_report(uuid, text, timestamptz, timestamptz);
 drop function if exists airwatch.report_metrics(uuid, timestamptz, timestamptz);

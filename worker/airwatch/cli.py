@@ -59,7 +59,7 @@ def cmd_run(a):
         day = date.today() - timedelta(days=1)
         ds = generate(ap, day, 1, a.seed)
         provider = FakeProvider(ds.observations, fail_rate=a.fail_rate, duplicate_rate=0.02)
-        t = [ds.start + timedelta(hours=7)]
+        t = [ds.start + timedelta(hours=11)]
         clock = lambda: t[0]  # noqa: E731
 
         def sleep(s):
@@ -95,6 +95,25 @@ def cmd_load_demo(a):
     print(json.dumps(process_window(ap, store, ds.start, ds.end), indent=2))
 
 
+def cmd_process(a):
+    """Recompute events and aggregates for a window (e.g. after a definition or zone change)."""
+    from .ingest import setup_logging
+    from .jobs import process_pending, process_window
+
+    setup_logging("INFO")
+    ap = load_airport(a.airport)
+    store = _store(a, ap)
+    if a.since:
+        start = datetime.fromisoformat(a.since).replace(tzinfo=timezone.utc)
+        end = datetime.now(timezone.utc) - timedelta(minutes=5)
+        day = timedelta(days=1)
+        while start < end:  # one day at a time keeps memory bounded
+            print(json.dumps(process_window(ap, store, start, min(start + day, end)), default=str))
+            start += day
+    else:
+        print(json.dumps(process_pending(ap, store), default=str))
+
+
 def cmd_seed_sql(a):
     from .seed_sql import seed_sql
 
@@ -124,12 +143,14 @@ def main(argv=None):
     s = sub.add_parser("seed-sql", help="regenerate supabase/seed.sql from config/airports")
     s.set_defaults(fn=cmd_seed_sql)
 
-    for name, fn in (("run", cmd_run), ("load-demo", cmd_load_demo)):
+    for name, fn in (("run", cmd_run), ("load-demo", cmd_load_demo), ("process", cmd_process)):
         s = sub.add_parser(name)
         s.add_argument("--store", choices=["memory", "postgres"], default="memory")
         s.add_argument("--source", default="synthetic")
         s.add_argument("--seed", type=int, default=7)
         s.add_argument("--days", type=int, default=7)
+        if name == "process":
+            s.add_argument("--since", help="UTC date/time to recompute from; default: continue from checkpoint")
         if name == "run":
             s.add_argument("--provider", choices=["fake", "licensed"], default="fake")
             s.add_argument("--iterations", type=int, default=60)

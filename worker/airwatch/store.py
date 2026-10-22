@@ -34,6 +34,8 @@ class Store(ABC):
     def upsert_events(self, events: list[Event]) -> int: ...
     @abstractmethod
     def replace_hourly_metrics(self, start: datetime, end: datetime, rows: list[dict]) -> None: ...
+    @abstractmethod
+    def review_statuses(self, event_ids: list[str]) -> dict[str, str]: ...
 
 
 class MemoryStore(Store):
@@ -86,6 +88,9 @@ class MemoryStore(Store):
                 n += 1
             self.events[e.event_id] = e
         return n
+
+    def review_statuses(self, event_ids):
+        return {i: self.events[i].review_status for i in event_ids if i in self.events}
 
     def replace_hourly_metrics(self, start, end, rows):
         self.hourly = [r for r in self.hourly if not (start <= r["hour"] < end)] + rows
@@ -219,6 +224,11 @@ class PostgresStore(Store):
                                   e.max_alt_ft, e.evidence_ids, json.dumps(e.details)))
                 n += 1 if cur.fetchone()[0] else 0
         return n
+
+    def review_statuses(self, event_ids):
+        with self.conn.cursor() as cur:
+            cur.execute("select id::text, review_status from airwatch.events where id = any(%s::uuid[])", (event_ids,))
+            return dict(cur.fetchall())
 
     def replace_hourly_metrics(self, start, end, rows):
         with self.conn.transaction(), self.conn.cursor() as cur:

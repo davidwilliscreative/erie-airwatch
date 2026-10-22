@@ -93,6 +93,7 @@ begin
   end;
   perform public.admin_set_report_status(r, 'approved');
   perform public.admin_set_report_status(r, 'published');
+  assert (select status from public.admin_list_reports(ap) limit 1) = 'published', 'admin report list';
 end $$;
 reset role;
 

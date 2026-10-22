@@ -101,3 +101,16 @@ def test_reprocessing_keeps_reviewer_decisions(airport, day):
     store.events[eid].review_status = "rejected"
     process_window(airport, store, day.start, day.end)
     assert store.events[eid].review_status == "rejected"
+
+
+def test_aggregates_respect_reviewer_rejections(airport, day):
+    store = MemoryStore()
+    store.add_observations(day.observations)
+    process_window(airport, store, day.start, day.end)
+    total = lambda: sum(r["value"] for r in store.hourly if r["metric"] == "circuit")  # noqa: E731
+    before = total()
+    for e in store.events.values():
+        if e.kind == "circuit":
+            e.review_status = "rejected"
+    process_window(airport, store, day.start, day.end)
+    assert before > 0 and total() == 0
