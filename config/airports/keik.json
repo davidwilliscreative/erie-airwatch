@@ -1,0 +1,150 @@
+{
+  "id": "8f1d7c2e-6a51-4c3e-9b1a-0e6f2a4b7c10",
+  "icao": "KEIK",
+  "name": "Erie Municipal Airport",
+  "city": "Erie, Colorado",
+  "timezone": "America/Denver",
+  "active": true,
+  "reference": {
+    "lat": 40.0103,
+    "lon": -105.0481,
+    "elevation_ft_msl": 5119
+  },
+  "geofence_radius_nm": 8,
+  "pattern": {
+    "altitude_ft_msl": 6130,
+    "altitude_source": "Erie Standard Airport Operating Procedures (per PRD, verify effective date)",
+    "verified": false,
+    "note": "Pattern direction per runway end must be confirmed against the current Erie SAOP and FAA Chart Supplement before launch."
+  },
+  "runways": [
+    {
+      "id": "15/33",
+      "length_ft": 4700,
+      "width_ft": 75,
+      "true_heading_deg": 158.0,
+      "ends": [
+        {
+          "ident": "15",
+          "lat": 40.016273,
+          "lon": -105.051251,
+          "elevation_ft_msl": 5119,
+          "landing_heading_deg": 158.0,
+          "pattern_direction": "left"
+        },
+        {
+          "ident": "33",
+          "lat": 40.004327,
+          "lon": -105.044949,
+          "elevation_ft_msl": 5119,
+          "landing_heading_deg": 338.0,
+          "pattern_direction": "left"
+        }
+      ],
+      "source": "Approximate geometry for development only. Replace with FAA NASR / airport diagram coordinates.",
+      "version": "dev-2026-10-22"
+    }
+  ],
+  "zones": [
+    {
+      "id": "0b8e6c1a-1f3d-4b7a-8a2e-5c9d0e1f2a01",
+      "slug": "zone-a",
+      "label": "Sample Zone A (northwest of field)",
+      "synthetic": true,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -105.078628,
+              40.021092
+            ],
+            [
+              -105.058667,
+              40.024689
+            ],
+            [
+              -105.056319,
+              40.039078
+            ],
+            [
+              -105.07628,
+              40.042676
+            ],
+            [
+              -105.078628,
+              40.021092
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "0b8e6c1a-1f3d-4b7a-8a2e-5c9d0e1f2a02",
+      "slug": "zone-b",
+      "label": "Sample Zone B (southeast of field)",
+      "synthetic": true,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -105.039881,
+              39.995012
+            ],
+            [
+              -105.018746,
+              39.99771
+            ],
+            [
+              -105.016398,
+              39.981522
+            ],
+            [
+              -105.037533,
+              39.978824
+            ],
+            [
+              -105.039881,
+              39.995012
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "0b8e6c1a-1f3d-4b7a-8a2e-5c9d0e1f2a03",
+      "slug": "zone-c",
+      "label": "Sample Zone C (east of field)",
+      "synthetic": true,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -105.030488,
+              40.004904
+            ],
+            [
+              -105.012875,
+              40.007602
+            ],
+            [
+              -105.012875,
+              40.024689
+            ],
+            [
+              -105.030488,
+              40.02289
+            ],
+            [
+              -105.030488,
+              40.004904
+            ]
+          ]
+        ]
+      }
+    }
+  ],
+  "notes": "All zones are placeholders. The project owner must select and approve real neighborhood polygons and public labels."
+}

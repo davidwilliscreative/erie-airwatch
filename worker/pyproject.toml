@@ -1,0 +1,23 @@
+[project]
+name = "airwatch-worker"
+version = "0.1.0"
+description = "Erie AirWatch ingestion worker and event-detection pipeline"
+requires-python = ">=3.11"
+dependencies = ["shapely>=2.0"]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+airwatch = "airwatch.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["airwatch*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
